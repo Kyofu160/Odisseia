@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Odisseia - Personagens Interativos</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8; color: #222;
+  }
+  header {
+    background: #1e88e5; color: white; padding: 1.5rem; text-align: center;
+    font-size: 1.8rem; font-weight: 700; letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .container {
+    max-width: 1100px; margin: 2rem auto; padding: 0 1rem;
+  }
+  nav {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin-bottom: 1rem;
+  }
+  nav button {
+    background: #2196f3; border: none; color: white;
+    padding: 0.5rem 1rem; border-radius: 9999px;
+    cursor: pointer; font-weight: 600; transition: background 0.3s;
+  }
+  nav button:hover, nav button.active {
+    background: #0d47a1;
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+  h2 {
+    border-bottom: 3px solid #90caf9; padding-bottom: 0.4rem;
+    margin-bottom: 1rem; font-weight: 700;
+  }
+  ul.list {
+    list-style: none; padding: 0; display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 1rem;
+  }
+  /* Item do personagem com design mais bonito */
+  ul.list li {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.3s ease;
+  }
+  ul.list li:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  /* Inputs dentro do personagem */
+  ul.list li input[type="text"],
+  ul.list li textarea {
+    width: 100%;
+    margin: 0.4rem 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1.5px solid #90caf9;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  ul.list li input[type="text"]:focus,
+  ul.list li textarea:focus {
+    border-color: #1e88e5;
+    outline: none;
+  }
+  ul.list li textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  ul.list li img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 0.8rem 0;
+    object-fit: contain;
+    max-height: 180px;
+    box-shadow: 0 4px 8px rgba(30, 136, 229, 0.3);
+    transition: transform 0.3s ease;
+    cursor: default;
+  }
+  ul.list li img:hover {
+    transform: scale(1.05);
+  }
+  /* Botões dentro do personagem */
+  ul.list li .btn {
+    margin-top: 0.6rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+    box-shadow: 0 2px 6px rgba(30, 136, 229, 0.4);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  ul.list li .btn-danger {
+    background: #e53935;
+    color: white;
+  }
+  ul.list li .btn-danger:hover {
+    background: #b71c1c;
+    box-shadow: 0 4px 10px rgba(181, 28, 28, 0.6);
+  }
+  ul.list li .btn-upload {
+    background: #1976d2;
+    color: white;
+  }
+  ul.list li .btn-upload:hover {
+    background: #0d47a1;
+    box-shadow: 0 4px 10px rgba(13, 71, 161, 0.6);
+  }
+  ul.list li .img-upload-single,
+  ul.list li .img-url-input {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    border: 1.2px solid #ccc;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+  }
+  ul.list li .img-upload-single:focus,
+  ul.list li .img-url-input:focus {
+    border-color: #1976d2;
+    outline: none;
+  }
+
+  .btn {
+    margin-top: 0.5rem; padding: 0.4rem 0.8rem;
+    border-radius: 6px; border: none; cursor: pointer;
+    font-weight: 600; user-select: none;
+  }
+  .btn-danger {
+    background: #e53935; color: white;
+  }
+  .btn-upload {
+    background: #1976d2; color: white;
+  }
+  .add-form, .new-topic {
+    background: #e3f2fd; padding: 1rem; border-radius: 12px;
+    margin-top: 1.5rem;
+  }
+  .add-form input[type="text"],
+  .add-form textarea,
+  .add-form input[type="file"],
+  .new-topic input[type="text"] {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  .add-form button {
+    background: #1e88e5;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.6rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 0.4rem;
+  }
+  .add-form button:hover {
+    background: #1565c0;
+  }
+  .new-topic input[type="text"] {
+    width: 100%; padding: 0.6rem; margin-bottom: 0.8rem;
+    border-radius: 6px; border: 1px solid #ccc;
+    font-family: inherit; font-size: 1rem;
+  }
+  .new-topic button {
+    background: #43a047; color: white; border: none;
+    padding: 0.6rem 1rem; border-radius: 8px;
+    font-weight: 700; cursor: pointer;
+    transition: background 0.3s;
+  }
+  .new-topic button:hover {
+    background: #2e7d32;
+  }
+  .remove-topic {
+    margin-top: 1rem; text-align: right;
+  }
+  .remove-topic button {
+    background: #c62828; color: white; border: none;
+    padding: 0.5rem 1rem; border-radius: 6px;
+    font-weight: 600; cursor: pointer;
+    transition: background 0.3s;
+  }
+  .remove-topic button:hover {
+    background: #8e0000;
+  }
+</style>
+</head>
+<body>
+<header>Odisseia - Personagens Interativos</header>
+<div class="container">
+  <nav id="category-nav"></nav>
+  <div id="sections-container"></div>
+  <div class="new-topic">
+    <input type="text" id="new-category" placeholder="Novo tópico (ex: Deuses, Pretendentes...)" />
+    <button id="add-category-btn">Adicionar Tópico</button>
+  </div>
+</div>
+
+<script>
+  // Dados carregados do localStorage ou default vazio
+  let categories = JSON.parse(localStorage.getItem('odyssey_categories') || '{}');
+
+  const nav = document.getElementById('category-nav');
+  const sectionsContainer = document.getElementById('sections-container');
+  const newCategoryInput = document.getElementById('new-category');
+  const addCategoryBtn = document.getElementById('add-category-btn');
+
+  function saveData() {
+    localStorage.setItem('odyssey_categories', JSON.stringify(categories));
+  }
+
+  function clearActiveNav() {
+    nav.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+  }
+
+  function clearActiveSection() {
+    sectionsContainer.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+  }
+
+  function showSection(name) {
+    clearActiveNav();
+    clearActiveSection();
+
+    const btn = nav.querySelector(`button[data-cat="${name}"]`);
+    if (btn) btn.classList.add('active');
+
+    const sec = document.getElementById(`section-${name}`);
+    if (sec) sec.classList.add('active');
+  }
+
+  function createNavButton(name) {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.dataset.cat = name;
+    btn.onclick = () => showSection(name);
+    nav.appendChild(btn);
+  }
+
+  function createSection(name) {
+    const sec = document.createElement('section');
+    sec.id = `section-${name}`;
+
+    sec.innerHTML = `
+      <h2>${name}</h2>
+      <ul class="list" id="list-${name}"></ul>
+
+      <div class="add-form">
+        <input type="text" id="name-${name}" placeholder="Nome do personagem" />
+        <textarea id="desc-${name}" rows="3" placeholder="Descrição do personagem"></textarea>
+        <input type="file" id="img-${name}" accept="image/*" />
+        <input type="text" id="imgurl-${name}" placeholder="URL da imagem (opcional)" />
+        <button id="btn-add-char-${name}">Adicionar personagem</button>
+      </div>
+
+      <div class="remove-topic">
+        <button id="btn-remove-cat-${name}">Remover Tópico</button>
+      </div>
+    `;
+
+    sectionsContainer.appendChild(sec);
+
+    // Adiciona eventos dos botões do tópico criado
+    document.getElementById(`btn-add-char-${name}`).onclick = () => addCharacter(name);
+    document.getElementById(`btn-remove-cat-${name}`).onclick = () => removeCategory(name);
+  }
+
+  function renderCharacter(category, character, index) {
+    const list = document.getElementById(`list-${category}`);
+
+    const li = document.createElement('li');
+
+    li.innerHTML = `
+      <input type="text" value="${character.name}" />
+      <textarea rows="3">${character.desc}</textarea>
+      ${character.img ? `<img src="${character.img}" alt="Imagem do personagem" onerror="this.style.display='none'"> <button class="btn btn-danger btn-remove-img">Remover imagem</button>` : ''}
+      <input type="file" class="img-upload-single" accept="image/*" />
+      <input type="text" class="img-url-input" placeholder="URL da imagem" value="${character.img || ''}" />
+      <button class="btn btn-upload btn-set-url">Aplicar URL</button>
+      <button class="btn btn-danger btn-remove-char">Remover personagem</button>
+    `;
+
+    const nameInput = li.querySelector('input[type="text"]');
+    const descInput = li.querySelector('textarea');
+
+    nameInput.onchange = () => {
+      categories[category][index].name = nameInput.value.trim();
+      saveData();
+    };
+    descInput.onchange = () => {
+      categories[category][index].desc = descInput.value.trim();
+      saveData();
+    };
+
+    // Remover imagem
+    const btnRemoveImg = li.querySelector('.btn-remove-img');
+    if (btnRemoveImg) {
+      btnRemoveImg.onclick = () => {
+        categories[category][index].img = '';
+        saveData();
+        renderAll();
+      };
+    }
+
+    // Remover personagem
+    li.querySelector('.btn-remove-char').onclick = () => {
+      if (!confirm('Tem certeza que deseja remover este personagem?')) return;
+      categories[category].splice(index, 1);
+      saveData();
+      renderAll();
+    };
+
+    // Upload nova imagem para personagem via upload file
+    const imgUpload = li.querySelector('.img-upload-single');
+    if (imgUpload) {
+      imgUpload.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          categories[category][index].img = reader.result;
+          saveData();
+          renderAll();
+        };
+        reader.readAsDataURL(file);
+      };
+    }
+
+    // Aplicar URL da imagem no personagem
+    const btnSetUrl = li.querySelector('.btn-set-url');
+    const imgUrlInput = li.querySelector('.img-url-input');
+    btnSetUrl.onclick = () => {
+      const url = imgUrlInput.value.trim();
+      if (!url) {
+        alert('Por favor, insira uma URL válida.');
+        return;
+      }
+      categories[category][index].img = url;
+      saveData();
+      renderAll();
+    };
+
+    list.appendChild(li);
+  }
+
+  function renderAll() {
+    nav.innerHTML = '';
+    sectionsContainer.innerHTML = '';
+
+    Object.keys(categories).forEach(cat => {
+      createNavButton(cat);
+      createSection(cat);
+
+      const list = document.getElementById(`list-${cat}`);
+      categories[cat].forEach((character, i) => {
+        renderCharacter(cat, character, i);
+      });
+    });
+
+    // Mostrar a primeira categoria automaticamente
+    const firstCat = Object.keys(categories)[0];
+    if (firstCat) {
+      showSection(firstCat);
+    }
+  }
+
+  function addCharacter(category) {
+    const nameInput = document.getElementById(`name-${category}`);
+    const descInput = document.getElementById(`desc-${category}`);
+    const imgInput = document.getElementById(`img-${category}`);
+    const imgUrlInput = document.getElementById(`imgurl-${category}`);
+
+    const name = nameInput.value.trim();
+    const desc = descInput.value.trim();
+    const file = imgInput.files[0];
+    const url = imgUrlInput.value.trim();
+
+    if (!name || !desc) {
+      alert('Por favor, preencha nome e descrição do personagem.');
+      return;
+    }
+
+    if (!categories[category]) categories[category] = [];
+
+    if (url) {
+      // Prioriza a URL se preenchida
+      categories[category].push({
+        name,
+        desc,
+        img: url
+      });
+      saveData();
+      renderAll();
+    } else if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        categories[category].push({
+          name,
+          desc,
+          img: reader.result
+        });
+        saveData();
+        renderAll();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      categories[category].push({
+        name,
+        desc,
+        img: ''
+      });
+      saveData();
+      renderAll();
+    }
+
+    // Limpar inputs
+    nameInput.value = '';
+    descInput.value = '';
+    imgInput.value = '';
+    imgUrlInput.value = '';
+  }
+
+  function removeCategory(category) {
+    if (!confirm(`Tem certeza que deseja remover o tópico "${category}" e todos os seus personagens?`)) return;
+    delete categories[category];
+    saveData();
+    renderAll();
+  }
+
+  addCategoryBtn.onclick = () => {
+    const newCat = newCategoryInput.value.trim();
+    if (!newCat) return alert('Digite um nome para o tópico.');
+    if (categories[newCat]) return alert('Tópico já existe.');
+    categories[newCat] = [];
+    saveData();
+    renderAll();
+    newCategoryInput.value = '';
+  };
+
+  // Inicialização
+  renderAll();
+</script>
+</body>
+</html> 
